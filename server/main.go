@@ -16,7 +16,7 @@ func main() {
 		rs := kr.ResultSet{}
 		dec.Decode(&rs)
 		fmt.Println(rs)
-		db, err := sql.Open("postgres","user=perf dbName=performace sslmode=disable")
+		db, err := sql.Open("postgres","user=perf password=RYecS6vt dbName=performace sslmode=disable")
 		if err != nil {
 			log.Fatal("Error: databasargumenten är felaktiga", err)
 		}
