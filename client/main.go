@@ -54,6 +54,8 @@ func test() kr.ResultSet {
 		log.Fatal("Could not get name of computer.")
 	}
 
+	rs.User = os.Getenv("USERNAME")
+
 	ticker := time.NewTicker(1*time.Minute);
 	rs.StartTime = time.Now();
 

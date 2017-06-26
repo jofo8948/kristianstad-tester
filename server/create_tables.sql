@@ -34,6 +34,7 @@ ALTER TABLE logs OWNER TO root;
 CREATE TABLE resultsets (
     id serial PRIMARY KEY,
     name character varying(50) NOT NULL,
+    user character varying(50) NOT NULL,
     start_date timestamp without time zone NOT NULL,
     end_date timestamp without time zone NOT NULL
 );

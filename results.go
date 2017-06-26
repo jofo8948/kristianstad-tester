@@ -8,6 +8,7 @@ import (
 
 type ResultSet struct {
 	Name string
+	User string
 	StartTime time.Time
 	EndTime time.Time
 	Results []Result

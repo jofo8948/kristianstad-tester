@@ -23,7 +23,7 @@ func main() {
 		dec.Decode(&rs)
 		fmt.Println(rs)
 
-		if (rs.Name == "" || rs.StartTime.Year() < 2017 || rs.EndTime.Year() < 2017) {
+		if (rs.Name == "" || rs.User == "" || rs.StartTime.Year() < 2017 || rs.EndTime.Year() < 2017) {
 			fmt.Fprintln(w, "Ogiltig indata. Kontrollera namn och de angivna tiderna.");
 			return;
 		}
@@ -43,22 +43,26 @@ func main() {
 		}
 
 
-		qs, err := db.Prepare("INSERT INTO ResultSets (name, start_date, end_date) VALUES ($1,$2,$3) RETURNING id;")
+		qs, err := db.Prepare("INSERT INTO ResultSets (name, user, start_date, end_date) VALUES ($1,$2,$3,$4) RETURNING id;")
 		if err != nil {
 		 	log.Fatal(err)
 		}
 
 		var inserted_id int;
-		err = qs.QueryRow(rs.Name, rs.StartTime, rs.EndTime).Scan(&inserted_id)
+		err = qs.QueryRow(rs.Name, rs.User, rs.StartTime, rs.EndTime).Scan(&inserted_id)
 		if err != nil {
-			log.Fatal("Could not store ResultSet in DB.", err)
+			log.Println("Could not store ResultSet in DB.", err)
+			http.Error(w, "Fel vid lagring av data.", 500)
+			return
 		}
 
 		lqs, err := db.Prepare("INSERT INTO Logs (resultset, message) VALUES ($1,$2);")
 		for _, x := range rs.Log {
 			_, err = lqs.Exec(inserted_id, x)
 			if err != nil {
-				log.Fatal("Could not store log entry: ", err)
+				log.Println("Could not store log entry: ", err)
+				http.Error(w, "Fel vid lagring av data.", 500)
+				continue;
 			}
 		}
 
@@ -67,7 +71,9 @@ func main() {
 			duration := fmt.Sprintf("%d microsecond", x.Duration/time.Microsecond)
 			_, err = rqs.Exec(x.Url, x.Comment, x.StartTime, duration, x.StatusCode, x.Size, inserted_id, x.Iteration)
 			if err != nil {
-				log.Fatal("Could not store result entry: ", err, x)
+				log.Println("Could not store result entry: ", err, x)
+				http.Error(w, "Fel vid lagring av data.", 500)
+				continue;
 			}
 		}
 
