@@ -55,7 +55,7 @@ func main() {
 
 		lqs, err := db.Prepare("INSERT INTO Logs (resultset, message) VALUES ($1,$2);")
 		for _, x := range rs.Log {
-			err = lqs.Exec(inserted_id, x)
+			_, err = lqs.Exec(inserted_id, x)
 			if err != nil {
 				log.Fatal("Could not store log entry: ", err)
 			}
@@ -63,9 +63,9 @@ func main() {
 
 		rqs, err := db.Prepare("INSERT INTO Results (url, comment, start_date, duration, statuscode, size, resultset, iteration) VALUES ($1,$2,$3,$4,$5,$6,$7,$8);")
 		for _, x := range rs.Results {
-			err = rqs.Exec(x.Url, x.Comment, x.StartTime, x.Duration, x.StatusCode, x.Size, inserted_id, x.Iteration)
+			_, err = rqs.Exec(x.Url, x.Comment, x.StartTime, x.Duration, x.StatusCode, x.Size, inserted_id, x.Iteration)
 			if err != nil {
-				log.Fatal("Could not store result entry: ", err, result)
+				log.Fatal("Could not store result entry: ", err, x)
 			}
 		}
 
