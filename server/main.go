@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"net/http"
 	"encoding/json"
 	"database/sql"
@@ -26,7 +27,9 @@ func main() {
 			return;
 		}
 
-		db, err := sql.Open("postgres","user=perf password=RYecS6vt dbName=performace sslmode=disable")
+		user, passw, dbname := os.Getenv("DBUSER"), os.Getenv("DBPASSWORD"), os.Getenv("DBNAME")
+		connectionString := fmt.Sprintf("user=%s password=%s dbName=%s sslmode=disable", user, passw, dbname)
+		db, err := sql.Open("postgres",connectionString)
 		if err != nil {
 			log.Fatal("Error: databasargumenten är felaktiga", err)
 		}
