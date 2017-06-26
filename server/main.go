@@ -58,9 +58,9 @@ func main() {
 			lqs.Exec(inserted_id, x)
 		}
 
-		rqs, err := db.Prepare("INSERT INTO Results (url, start_date, duration, resultset, iteration) VALUES ($1,$2,$3,$4,$5);")
+		rqs, err := db.Prepare("INSERT INTO Results (url, comment, start_date, duration, statuscode, size, resultset, iteration) VALUES ($1,$2,$3,$4,$5,$6,$7,$8);")
 		for _, x := range rs.Results {
-			rqs.Exec(x.Url, x.StartTime, x.Duration, inserted_id, x.Iteration)
+			rqs.Exec(x.Url, x.Comment, x.StartTime, x.Duration, x.StatusCode, x.Size, inserted_id, x.Iteration)
 		}
 
 

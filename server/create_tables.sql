@@ -6,8 +6,12 @@ DROP TABLE IF EXISTS resultsets;
 CREATE TABLE results (
     id serial PRIMARY KEY,
     url character varying(250) NOT NULL,
+    comment character varying(250),
     start_date timestamp without time zone NOT NULL,
     duration interval NOT NULL,
+    statuscode integer NOT NULL,
+    size integer NOT NULL,
+    iteration integer NOT NULL,
     resultset integer
 );
 
