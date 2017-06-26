@@ -42,7 +42,7 @@ func main() {
 		}
 
 
-		qs, err := db.Prepare("INSERT INTO ResultSet (name, start_date, end_date) VALUES ($1,$2,$3) RETURNING id;")
+		qs, err := db.Prepare("INSERT INTO ResultSets (name, start_date, end_date) VALUES ($1,$2,$3) RETURNING id;")
 		if err != nil {
 		 	log.Fatal(err)
 		}
@@ -53,10 +53,17 @@ func main() {
 			log.Fatal("Could not store ResultSet in DB.", err)
 		}
 
-		rqs, err := db.Prepare("INSERT INTO Result (url, start_date, duration, resultset, iteration) VALUES ($1,$2,$3,$4,$5);")
+		lqs, err := db.Prepare("INSERT INTO Logs (resultset, message) VALUES ($1,$2);")
+		for _, x := range rs.Log {
+			lqs.Exec(inserted_id, x)
+		}
+
+		rqs, err := db.Prepare("INSERT INTO Results (url, start_date, duration, resultset, iteration) VALUES ($1,$2,$3,$4,$5);")
 		for _, x := range rs.Results {
 			rqs.Exec(x.Url, x.StartTime, x.Duration, inserted_id, x.Iteration)
 		}
+
+
 
 		fmt.Fprintln(w, "Tack för ditt bidrag.")
 	})
