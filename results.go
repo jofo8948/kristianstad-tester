@@ -38,5 +38,5 @@ type Result struct {
 }
 
 func (r Result) String() string {
-	return fmt.Sprintf("%s: %s [%d] // %s", r.Url, r.Duration, r.StatusCode, r.Comment)
+	return fmt.Sprintf("%d{ %s: %s @ %s [%d] [%d] // %s}", r.Iteration, r.Url, r.Duration, r.StartTime, r.StatusCode, r.Size, r.Comment)
 }
