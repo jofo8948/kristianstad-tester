@@ -34,12 +34,9 @@ type Result struct {
 	Duration time.Duration
 	StatusCode int
 	Size int
+	Iteration int
 }
 
 func (r Result) String() string {
 	return fmt.Sprintf("%s: %s [%d] // %s", r.Url, r.Duration, r.StatusCode, r.Comment)
-}
-
-func (r Result) MarshalText() ([]byte, error) {
-	return []byte(r.String()), nil
 }

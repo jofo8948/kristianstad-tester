@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 	"net/http"
 	"os"
@@ -15,10 +16,35 @@ import (
 
 const (
 	centralServer = "146.185.158.83"
-	MaxTests = 2
+	MaxTests = 30
+)
+
+var (
+urls = []string {
+		"http://www.kristianstad.se",
+		"https://www.kristianstad.se",
+		"https://www.kristianstad.se/sv/e-tjanster/",
+		"https://www.kristianstad.se/globalassets/blanketter/barn-och-utbildning/ansokan_tillaggsbelopp_frst.pdf",
+		"https://www.kristianstad.se/sv/barn-och-utbildning/grundskola/",
+		"https://www.kristianstad.se/sv/bygga-bo-och-miljo/bygga-nytt-andra-eller-riva/bygglov/",
+		"https://www.kristianstad.se/sv/bygga-bo-och-miljo/bostader/hitta-bostad/",
+		"https://www.kristianstad.se/sv/huvudnyheter/",
+		"https://www.kristianstad.se/sv/trafik-och-resor/trafik-resor-och-gator/",
+		"https://www.kristianstad.se/sv/kommun-och-politik/overklaga-beslut-rattssakerhet/",
+		"http://turism.kristianstad.se/",
+		"http://" + centralServer,
+	}
+
+	bar = pb.New(MaxTests*len(urls))
 )
 
 func main() {
+	rs := test()
+	sendToServer(rs)
+	shutdown()
+}
+
+func test() kr.ResultSet {
 	rs := &kr.ResultSet{}
 	log.SetOutput(rs)
 	defer log.SetOutput(os.Stdout)
@@ -28,18 +54,9 @@ func main() {
 		log.Fatal("Could not get name of computer.")
 	}
 
-	urls := []string {
-		"http://www.kristianstad.se",
-		"https://www.kristianstad.se",
-		"https://www.kristianstad.se/sv/barn-och-utbildning/grundskola/",
-		"https://www.kristianstad.se/sv/bygga-bo-och-miljo/bygga-nytt-andra-eller-riva/bygglov/",
-		"https://www.kristianstad.se/sv/bygga-bo-och-miljo/bostader/hitta-bostad/",
-		"https://www.kristianstad.se/sv/huvudnyheter/",
-	}
-
 	ticker := time.NewTicker(1*time.Minute);
 	rs.StartTime = time.Now();
-	bar := pb.New(MaxTests)
+
 	bar.ShowTimeLeft = false
 	bar.ShowBar = true
 	bar.Start()
@@ -48,8 +65,7 @@ loop:
 	for i := 0; i < MaxTests; i++ {
 		select {
 			case <-ticker.C:
-					res := runTest(urls)
-					bar.Increment()
+					res := runTest(urls, i)
 					rs.Results = append(rs.Results, res...)
 			case <-time.After(3*time.Hour):
 				ticker.Stop(); break loop
@@ -57,24 +73,16 @@ loop:
 	}
 
 	rs.EndTime = time.Now()
-
-
-	rd, wrt := io.Pipe();
-
-	go func() {
-		enc := json.NewEncoder(wrt)
-		enc.Encode(rs);
-		wrt.Close();
-	}()
-	http.Post(centralServer + "/data", "application/json", rd)
 	bar.FinishPrint("Klart!")
-	os.Exit(0);
+	return *rs;
 }
 
-func runTest(urls []string) (rs []kr.Result) {
+func runTest(urls []string, iter int) (rs []kr.Result) {
 	for _, url := range urls {
 		r := testUrl(url)
+		r.Iteration = iter
 		rs = append(rs, r)
+		bar.Increment()
 	}
 	return;
 }
@@ -101,4 +109,27 @@ func testUrl(url string) (r kr.Result) {
 	r.Duration = time.Now().Sub(r.StartTime)
 
 	return r;
+}
+
+func sendToServer(rs kr.ResultSet) {
+	fmt.Println("Skickar den insamlade informationen till Sigma ITC...")
+	rd, wrt := io.Pipe();
+
+	go func() {
+		defer wrt.Close()
+		enc := json.NewEncoder(wrt)
+		enc.Encode(rs)
+	}()
+
+	_, err := http.Post("http://" + centralServer + "/data", "application/json", rd)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func shutdown() {
+	fmt.Println("Klart. Programmet kommer nu stänga sig självt.")
+	fmt.Println("Ha en fortsatt bra dag!")
+	time.Sleep(3*time.Second)
+	os.Exit(0)
 }

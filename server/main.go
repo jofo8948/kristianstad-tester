@@ -11,11 +11,21 @@ import (
 )
 
 func main() {
+	http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Det här är en testsida för Kristianstad-testet. Om du vill veta mer om experimentet, kontakta johan (punkt) fogelstrom (snabel-a) sigma (punkt) se.")
+	})
+
 	http.HandleFunc("/data", func (w http.ResponseWriter, r *http.Request) {
 		dec := json.NewDecoder(r.Body)
 		rs := kr.ResultSet{}
 		dec.Decode(&rs)
 		fmt.Println(rs)
+
+		if (rs.Name == "" || rs.StartTime.Year() < 2017 || rs.EndTime.Year() < 2017) {
+			fmt.Fprintln(w, "Ogiltig indata. Kontrollera namn och de angivna tiderna.");
+			return;
+		}
+
 		db, err := sql.Open("postgres","user=perf password=RYecS6vt dbName=performace sslmode=disable")
 		if err != nil {
 			log.Fatal("Error: databasargumenten är felaktiga", err)
@@ -40,11 +50,12 @@ func main() {
 			log.Fatal("Could not store ResultSet in DB.", err)
 		}
 
-		rqs, err := db.Prepare("INSERT INTO Result (url, start_date, duration, resultset) VALUES ($1,$2,$3,$4);")
+		rqs, err := db.Prepare("INSERT INTO Result (url, start_date, duration, resultset, iteration) VALUES ($1,$2,$3,$4,$5);")
 		for _, x := range rs.Results {
-			rqs.Exec(x.Url, x.StartTime, x.Duration, inserted_id)
+			rqs.Exec(x.Url, x.StartTime, x.Duration, inserted_id, x.Iteration)
 		}
 
+		fmt.Fprintln(w, "Tack för ditt bidrag.")
 	})
 
 	http.ListenAndServe(":80", nil)
