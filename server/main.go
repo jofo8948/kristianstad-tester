@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 	"net/http"
 	"encoding/json"
 	"database/sql"
@@ -63,7 +64,8 @@ func main() {
 
 		rqs, err := db.Prepare("INSERT INTO Results (url, comment, start_date, duration, statuscode, size, resultset, iteration) VALUES ($1,$2,$3,$4,$5,$6,$7,$8);")
 		for _, x := range rs.Results {
-			_, err = rqs.Exec(x.Url, x.Comment, x.StartTime, x.Duration, x.StatusCode, x.Size, inserted_id, x.Iteration)
+			duration := fmt.Sprintf("%d microsecond", x.Duration/time.Microsecond)
+			_, err = rqs.Exec(x.Url, x.Comment, x.StartTime, duration, x.StatusCode, x.Size, inserted_id, x.Iteration)
 			if err != nil {
 				log.Fatal("Could not store result entry: ", err, x)
 			}
