@@ -29,19 +29,15 @@ func main() {
 		}
 
 
-		qs, err := db.Prepare("INSERT INTO ResultSet (name, start_date, end_date) VALUES ($1,$2,$3);")
+		qs, err := db.Prepare("INSERT INTO ResultSet (name, start_date, end_date) VALUES ($1,$2,$3) RETURNING id;")
 		if err != nil {
 		 	log.Fatal(err)
 		}
 
-		res, err := qs.Exec(rs.Name, rs.StartTime, rs.EndTime)
+		var inserted_id int;
+		err = qs.QueryRow(rs.Name, rs.StartTime, rs.EndTime).Scan(&inserted_id)
 		if err != nil {
 			log.Fatal("Could not store ResultSet in DB.", err)
-		}
-
-		inserted_id, err := res.LastInsertId();
-		if (err != nil) {
-			log.Fatal("Could not get insert id from resultset.");
 		}
 
 		rqs, err := db.Prepare("INSERT INTO Result (url, start_date, duration, resultset) VALUES ($1,$2,$3,$4);")
