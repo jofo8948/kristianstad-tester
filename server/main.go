@@ -43,7 +43,7 @@ func main() {
 		}
 
 
-		qs, err := db.Prepare("INSERT INTO ResultSets (name, user, start_date, end_date) VALUES ($1,$2,$3,$4) RETURNING id;")
+		qs, err := db.Prepare("INSERT INTO ResultSets (name, username, start_date, end_date) VALUES ($1,$2,$3,$4) RETURNING id;")
 		if err != nil {
 		 	log.Fatal(err)
 		}
