@@ -16,7 +16,7 @@ import (
 
 const (
 	centralServer = "146.185.158.83"
-	MaxTests = 30
+	MaxTests = 12
 )
 
 var (
@@ -32,6 +32,7 @@ urls = []string {
 		"https://www.kristianstad.se/sv/trafik-och-resor/trafik-resor-och-gator/",
 		"https://www.kristianstad.se/sv/kommun-och-politik/overklaga-beslut-rattssakerhet/",
 		"http://turism.kristianstad.se/",
+		"https://intranat.kristianstad.se",
 		"http://" + centralServer,
 	}
 
@@ -56,15 +57,19 @@ func test() kr.ResultSet {
 
 	rs.User = os.Getenv("USERNAME")
 
-	ticker := time.NewTicker(1*time.Minute);
+	ticker := time.NewTicker(10*time.Minute);
 	rs.StartTime = time.Now();
 
-	bar.ShowTimeLeft = false
+	bar.ShowTimeLeft = true
 	bar.ShowBar = true
 	bar.Start()
 
+	{
+		res := runTest(urls, 0)
+		rs.Results = append(rs.Results, res...)
+	}
 loop:
-	for i := 0; i < MaxTests; i++ {
+	for i := 1; i < MaxTests-1; i++ {
 		select {
 			case <-ticker.C:
 					res := runTest(urls, i)
