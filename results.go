@@ -3,7 +3,6 @@ package kristianstad
 import (
 	"time"
 	"fmt"
-	"encoding/json"
 )
 
 type ResultSet struct {
@@ -21,11 +20,8 @@ func (rs *ResultSet) Write(p []byte) (n int, err error) {
 }
 
 func (rs ResultSet) String() string {
-	j, err := json.MarshalIndent(rs, "", "  ");
-	if err != nil {
-		return "failed to serialize the ResultSet"
-	}
-	return string(j)
+	return fmt.Sprintf("ResultSet{Name: %s, User: %s, StartTime: %s, EndTime: %s, Results: %d, Logs: %d }",
+		rs.Name, rs.User, rs.StartTime, rs.EndTime, len(rs.Results), len(rs.Log));
 }
 
 type Result struct {
