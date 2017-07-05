@@ -77,8 +77,6 @@ func main() {
 			}
 		}
 
-
-
 		fmt.Fprintln(w, "Tack för ditt bidrag.")
 	})
 
