@@ -16,7 +16,7 @@ import (
 
 const (
 	centralServer = "146.185.158.83"
-	MaxTests = 12
+	MaxTests = 15
 )
 
 var (
@@ -69,7 +69,7 @@ func test() kr.ResultSet {
 		rs.Results = append(rs.Results, res...)
 	}
 loop:
-	for i := 1; i < MaxTests-1; i++ {
+	for i := 1; i < MaxTests; i++ {
 		select {
 			case <-ticker.C:
 					res := runTest(urls, i)
