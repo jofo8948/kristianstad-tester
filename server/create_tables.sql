@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS resultsets;
 
 -- Table Results
 CREATE TABLE results (
-    id serial PRIMARY KEY,
+    id bigserial PRIMARY KEY,
     url character varying(250) NOT NULL,
     comment character varying(250),
     start_date timestamp without time zone NOT NULL,
@@ -21,7 +21,7 @@ ALTER TABLE results OWNER TO root;
 
 -- Table Logs
 CREATE TABLE logs (
-    id serial PRIMARY KEY,
+    id bigserial PRIMARY KEY,
     resultset integer NOT NULL,
     message text
 );
@@ -32,7 +32,7 @@ ALTER TABLE logs OWNER TO root;
 
 -- Table ResultSets
 CREATE TABLE resultsets (
-    id serial PRIMARY KEY,
+    id bigserial PRIMARY KEY,
     name character varying(50) NOT NULL,
     username character varying(50) NOT NULL,
     start_date timestamp without time zone NOT NULL,
