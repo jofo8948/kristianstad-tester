@@ -17,7 +17,7 @@ import (
 const (
 	centralServer = "146.185.158.83"
 	MaxTests = 5
-	TimeBetweenTests = 1 * time.Minute
+	TimeBetweenTests = 10 * time.Minute
 )
 
 var (
@@ -124,7 +124,6 @@ urls = []string {
 		"https://www.facebook.com/impression.php/f6a0333c71b8d4/?api_key=1803562503209635&lid=115&payload=%7B%22source%22%3A%22jssdk%22%7D",
 		"https://staticxx.facebook.com/connect/xd_arbiter/r/0sTQzbapM8j.js?version=42",
 		"https://www.kristianstad.se/globalassets/webmaster/bild/tostebergahamn.jpg",
-
 	}
 
 	bar = pb.New(MaxTests)
